@@ -28,3 +28,19 @@ export const getByCategory = async (req, res, next) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const claimLostItem = async (req, res, next) => {
+  try {
+    const id = req.query.id
+    const lostItem = await LostItem.findById(id);
+    if (lostItem.category === 'FOUND') {
+      return res.status(402).json({message: "Item has already been claimed"});
+    }
+
+    await lostItem.updateOne({_id: id}, {category: "FOUND"})
+    return res.status(200).json({message: "Item has been claimed"});
+  } catch (error) {
+    console.error("Error claiming lost item:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
